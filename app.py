@@ -8,6 +8,8 @@ from src.config import (
     NAMESPACE_MAP
 )
 
+# Rest of your app.py code remains the same...
+
 def load_css():
     """Load custom CSS styles"""
     st.markdown("""
