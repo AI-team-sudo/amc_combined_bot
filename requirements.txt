@@ -1,0 +1,5 @@
+streamlit>=1.31.0
+openai
+pinecone
+python-dotenv>=1.0.0
+tiktoken>=0.5.2
