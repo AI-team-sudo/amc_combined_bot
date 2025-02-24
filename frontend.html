@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMC Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+    }
+    .left-column {
+      width: 25%;
+      background-color: #f4f4f4;
+      padding: 20px;
+      text-align: center;
+      border-right: 1px solid #ddd;
+    }
+    .left-column img {
+      width: 100px;
+      margin-bottom: 10px;
+    }
+    .left-column h1 {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .left-column p {
+      font-size: 14px;
+      color: #555;
+    }
+    .chat-container {
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-box {
+      width: 60%;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .button-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button-group button:hover {
+      background-color: #ddd;
+    }
+    .chat-input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="left-column">
+    <img src="https://ahmedabadcity.gov.in/images/amc-logo.png" alt="AMC Logo">
+    <h1>Ahmedabad Municipal Corporation</h1>
+    <h1>અમદાવાદ મ્યુનિસિપલ કોર્પોરેશન</h1>
+    <p>Providing services and information to the citizens of Ahmedabad.</p>
+  </div>
+  <div class="chat-container">
+    <div class="chat-box">
+      <div class="button-group">
+        <button onclick="selectNamespace('gpmcact')">GPMC Act</button>
+        <button onclick="selectNamespace('taxlaw')">Tax Law</button>
+        <button onclick="selectNamespace('compcirculars')">Compilation of Circulars</button>
+      </div>
+      <textarea id="chat-input" class="chat-input" placeholder="Type your query here..."></textarea>
+      <button onclick="sendQuery()">Send</button>
+      <div id="chat-response"></div>
+    </div>
+  </div>
+
+  <script>
+    let selectedNamespace = '';
+
+    function selectNamespace(namespace) {
+      selectedNamespace = namespace;
+      alert(`Selected namespace: ${namespace}`);
+    }
+
+    async function sendQuery() {
+      const userInput = document.getElementById('chat-input').value;
+      if (!selectedNamespace) {
+        alert('Please select a topic first.');
+        return;
+      }
+
+      const response = await fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_input: userInput, namespace: selectedNamespace })
+      });
+
+      const data = await response.json();
+      document.getElementById('chat-response').innerText = data.response;
+    }
+  </script>
+</body>
+</html>
