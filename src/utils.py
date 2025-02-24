@@ -17,14 +17,35 @@ def initialize_services():
         st.stop()
         return None
 
-def query_pinecone(index, namespace: str, query: str) -> List[Dict]:
-    """Query Pinecone index for relevant context"""
+def get_query_embedding(query: str) -> List[float]:
+    """Generate embeddings for the query using OpenAI's embedding model."""
     try:
+        response = openai.Embedding.create(
+            model="text-embedding-ada-002",  # Use OpenAI's embedding model
+            input=query
+        )
+        return response['data'][0]['embedding']
+    except openai.error.OpenAIError as e:
+        st.error(f"OpenAI Embedding API error: {str(e)}")
+        return []
+    except Exception as e:
+        st.error(f"Unexpected error generating embeddings: {str(e)}")
+        return []
+
+def query_pinecone(index, namespace: str, query: str) -> List[Dict]:
+    """Query Pinecone index for relevant context."""
+    try:
+        # Generate query embedding
+        query_vector = get_query_embedding(query)
+        if not query_vector:
+            return []
+
+        # Query Pinecone with the embedding
         response = index.query(
+            vector=query_vector,
             namespace=namespace,
             top_k=5,
-            include_metadata=True,
-            vector=query
+            include_metadata=True
         )
         return response['matches']
     except PineconeException as e:
