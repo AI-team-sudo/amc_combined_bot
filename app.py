@@ -12,13 +12,14 @@ def load_css():
     st.markdown("""
         <style>
         .main-header {
-            text-align: center;
+            text-align: left;
             color: #1976d2;
             padding: 1rem 0;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             border-bottom: 2px solid #e0e0e0;
-            font-size: 1.5rem;
+            font-size: 2rem;
             line-height: 1.4;
+            font-weight: 600;
         }
         .sidebar-logo {
             text-align: center;
@@ -62,9 +63,10 @@ def load_css():
             background-color: #ffffff;
             padding: 1.5rem;
             border-radius: 8px;
-            height: calc(100vh - 300px);
+            height: calc(100vh - 400px);
             overflow-y: auto;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-top: 1rem;
         }
         .chat-message {
             padding: 1.2rem;
@@ -103,6 +105,12 @@ def load_css():
             border-color: #1976d2;
             box-shadow: 0 0 0 2px rgba(25,118,210,0.1);
         }
+        .subheader {
+            color: #1976d2;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -115,9 +123,6 @@ def initialize_session_state():
 
 def display_sidebar():
     """Display the sidebar with the AMC logo and contact list"""
-    # Main header moved to sidebar
-    st.markdown('<h1 class="main-header">AI Agents for the Ahmedabad Municipal Corporation</h1>', unsafe_allow_html=True)
-
     st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
     st.image(AMC_LOGO_URL, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -187,7 +192,12 @@ def main():
         display_sidebar()
 
     with col2:
-        st.markdown(f"### Know more about {st.session_state.current_namespace}")
+        # Main header moved to right column
+        st.markdown('<h1 class="main-header">AI Agents for the Ahmedabad Municipal Corporation</h1>', unsafe_allow_html=True)
+
+        # Subheader for current namespace
+        st.markdown(f'<div class="subheader">Know more about {st.session_state.current_namespace}</div>', unsafe_allow_html=True)
+
         display_chat_messages()
 
         # User input in a container
