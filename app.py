@@ -91,14 +91,9 @@ def display_sidebar():
     st.markdown('<div class="contact-list">', unsafe_allow_html=True)
     for namespace in NAMESPACE_MAP.keys():
         active_class = "active" if namespace == st.session_state.current_namespace else ""
+        # Use only st.button() to handle namespace selection
         if st.button(namespace, key=f"contact_{namespace}"):
             st.session_state.current_namespace = namespace
-        st.markdown(
-            f"""<div class="contact-item {active_class}">
-                <strong>{namespace}</strong>
-            </div>""",
-            unsafe_allow_html=True
-        )
     st.markdown('</div>', unsafe_allow_html=True)
 
 def display_chat_messages():
