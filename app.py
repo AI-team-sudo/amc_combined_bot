@@ -1,5 +1,4 @@
 import streamlit as st
-import time
 from src.utils import initialize_services, process_user_query
 from src.config import (
     PAGE_TITLE,
@@ -12,6 +11,14 @@ def load_css():
     """Load custom CSS styles"""
     st.markdown("""
         <style>
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .sidebar-logo img {
+            max-width: 100px;
+            margin-bottom: 1rem;
+        }
         .contact-list {
             background-color: #f0f2f6;
             padding: 1rem;
@@ -28,6 +35,7 @@ def load_css():
             align-items: center;
             background-color: #ffffff;
             border: 1px solid #ddd;
+            transition: background-color 0.3s, border-left 0.3s;
         }
         .contact-item:hover {
             background-color: #e3f2fd;
@@ -74,8 +82,12 @@ def initialize_session_state():
     if "current_namespace" not in st.session_state:
         st.session_state.current_namespace = list(NAMESPACE_MAP.keys())[0]
 
-def display_contact_list():
-    """Display the list of namespaces as contacts"""
+def display_sidebar():
+    """Display the sidebar with the AMC logo and contact list"""
+    st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
+    st.image(AMC_LOGO_URL, use_column_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown('<div class="contact-list">', unsafe_allow_html=True)
     for namespace in NAMESPACE_MAP.keys():
         active_class = "active" if namespace == st.session_state.current_namespace else ""
@@ -141,8 +153,7 @@ def main():
     col1, col2 = st.columns([1, 3])
 
     with col1:
-        st.markdown("### Contacts")
-        display_contact_list()
+        display_sidebar()
 
     with col2:
         st.markdown(f"### Chat with {st.session_state.current_namespace}")
