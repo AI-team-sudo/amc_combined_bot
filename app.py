@@ -11,10 +11,14 @@ def load_css():
     """Load custom CSS styles"""
     st.markdown("""
         <style>
+        /* Remove extra space at the top */
+        .block-container {
+            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+        }
         .main-header {
             text-align: left;
             color: #1976d2;
-            padding: 1rem 0;
             margin-bottom: 1rem;
             font-size: 1.8rem;
             line-height: 1.4;
