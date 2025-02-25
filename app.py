@@ -85,7 +85,7 @@ def initialize_session_state():
 def display_sidebar():
     """Display the sidebar with the AMC logo and contact list"""
     st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
-    st.image(AMC_LOGO_URL, use_column_width=True)
+    st.image(AMC_LOGO_URL, use_container_width=True)  # Updated to use_container_width
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="contact-list">', unsafe_allow_html=True)
