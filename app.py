@@ -1,4 +1,3 @@
-
 import streamlit as st
 import time
 from src.utils import initialize_services, process_user_query
@@ -8,8 +7,6 @@ from src.config import (
     AMC_LOGO_URL,
     NAMESPACE_MAP
 )
-
-# Rest of your app.py code remains the same...
 
 def load_css():
     """Load custom CSS styles"""
@@ -76,6 +73,13 @@ def initialize_session_state():
     """Initialize session state variables"""
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    else:
+        # Validate existing messages
+        st.session_state.messages = [
+            msg for msg in st.session_state.messages
+            if isinstance(msg, dict) and 'user' in msg and 'bot' in msg
+        ]
+
     if "current_topic" not in st.session_state:
         st.session_state.current_topic = list(NAMESPACE_MAP.keys())[0]
 
@@ -110,26 +114,30 @@ def display_sidebar():
 
 def display_chat_messages():
     """Display chat message history"""
-    for idx, message in enumerate(st.session_state.messages):
-        # User message
-        with st.container():
-            st.markdown(
-                f"""<div class="chat-message user-message">
-                    <div class="message-label">You</div>
-                    <div style="margin-top: 1rem">{message["user"]}</div>
-                </div>""",
-                unsafe_allow_html=True
-            )
+    for message in st.session_state.messages:
+        try:
+            # User message
+            with st.container():
+                st.markdown(
+                    f"""<div class="chat-message user-message">
+                        <div class="message-label">You</div>
+                        <div style="margin-top: 1rem">{message.get('user', '')}</div>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
 
-        # Bot message
-        with st.container():
-            st.markdown(
-                f"""<div class="chat-message bot-message">
-                    <div class="message-label">Bot</div>
-                    <div style="margin-top: 1rem">{message["bot"]}</div>
-                </div>""",
-                unsafe_allow_html=True
-            )
+            # Bot message
+            with st.container():
+                st.markdown(
+                    f"""<div class="chat-message bot-message">
+                        <div class="message-label">Bot</div>
+                        <div style="margin-top: 1rem">{message.get('bot', '')}</div>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+        except Exception as e:
+            st.error(f"Error displaying message: {str(e)}")
+            continue
 
 def main():
     """Main application function"""
