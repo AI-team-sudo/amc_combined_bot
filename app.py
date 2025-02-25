@@ -15,12 +15,14 @@ def load_css():
             text-align: center;
             color: #1976d2;
             padding: 1rem 0;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             border-bottom: 2px solid #e0e0e0;
+            font-size: 1.5rem;
+            line-height: 1.4;
         }
         .sidebar-logo {
             text-align: center;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             padding: 1rem;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -113,6 +115,9 @@ def initialize_session_state():
 
 def display_sidebar():
     """Display the sidebar with the AMC logo and contact list"""
+    # Main header moved to sidebar
+    st.markdown('<h1 class="main-header">AI Agents for the Ahmedabad Municipal Corporation</h1>', unsafe_allow_html=True)
+
     st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
     st.image(AMC_LOGO_URL, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -157,7 +162,7 @@ def display_chat_messages():
                 unsafe_allow_html=True
             )
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
 def main():
     """Main application function"""
     st.set_page_config(
@@ -169,9 +174,6 @@ def main():
 
     load_css()
     initialize_session_state()
-
-    # Main header
-    st.markdown('<h1 class="main-header">AI Agents for the Ahmedabad Municipal Corporation</h1>', unsafe_allow_html=True)
 
     try:
         index, openai_client = initialize_services()
