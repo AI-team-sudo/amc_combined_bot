@@ -15,9 +15,8 @@ def load_css():
             text-align: left;
             color: #1976d2;
             padding: 1rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
             line-height: 1.4;
             font-weight: 600;
         }
@@ -28,19 +27,20 @@ def load_css():
             border-bottom: 1px solid #e0e0e0;
         }
         .sidebar-logo img {
-            max-width: 120px;
+            max-width: 100%;
+            height: auto;
             margin-bottom: 1rem;
         }
         .contact-list {
             background-color: #f8f9fa;
-            padding: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
-            height: 100%;
+            height: auto;
             overflow-y: auto;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .contact-item {
-            padding: 1rem;
+            padding: 0.8rem;
             margin-bottom: 0.8rem;
             border-radius: 8px;
             cursor: pointer;
@@ -61,17 +61,17 @@ def load_css():
         }
         .chat-container {
             background-color: #ffffff;
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: 8px;
-            height: calc(100vh - 400px);
+            height: auto;
             overflow-y: auto;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-top: 1rem;
         }
         .chat-message {
-            padding: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             position: relative;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -90,7 +90,7 @@ def load_css():
             margin-bottom: 0.5rem;
         }
         .input-container {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             padding: 1rem;
             background-color: #ffffff;
             border-radius: 8px;
@@ -104,12 +104,6 @@ def load_css():
         .stTextInput input:focus {
             border-color: #1976d2;
             box-shadow: 0 0 0 2px rgba(25,118,210,0.1);
-        }
-        .subheader {
-            color: #1976d2;
-            font-size: 1.5rem;
-            margin-top: 1rem;
-            margin-bottom: 1.5rem;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -192,11 +186,11 @@ def main():
         display_sidebar()
 
     with col2:
-        # Main header moved to right column
+        # Main header in the right column
         st.markdown('<h1 class="main-header">AI Agents for the Ahmedabad Municipal Corporation</h1>', unsafe_allow_html=True)
 
         # Subheader for current namespace
-        st.markdown(f'<div class="subheader">Know more about {st.session_state.current_namespace}</div>', unsafe_allow_html=True)
+        st.markdown(f"### Know more about {st.session_state.current_namespace}")
 
         display_chat_messages()
 
