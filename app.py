@@ -13,7 +13,7 @@ def load_css():
         <style>
         /* Remove extra space at the top */
         .block-container {
-            padding-top: 0.5rem;
+            padding-top: 2.5rem;
             padding-bottom: 1rem;
         }
         .main-header {
