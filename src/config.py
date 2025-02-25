@@ -15,4 +15,4 @@ TEMPERATURE = 0.7
 # UI Configuration
 PAGE_TITLE = "AMC Chatbot"
 PAGE_ICON = "🏛️"
-AMC_LOGO_URL = "https://ahmedabadcity.gov.in/images/amc-logo.png"
+AMC_LOGO_URL = "https://images.indianexpress.com/2017/10/ahmedabad-municipal-c759.jpg?w=414"
