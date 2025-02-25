@@ -124,6 +124,40 @@ def display_sidebar():
             st.session_state.current_namespace = namespace
     st.markdown('</div>', unsafe_allow_html=True)
 
+def display_chat_messages():
+    """Display chat messages for the selected namespace"""
+    namespace = st.session_state.current_namespace
+    messages = st.session_state.messages[namespace]
+
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    if not messages:
+        st.markdown(
+            '<div class="chat-message bot-message">'
+            '<div class="message-label">Bot</div>'
+            '<div>Hello! How can I help you today?</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    else:
+        for message in messages:
+            # User message
+            st.markdown(
+                f"""<div class="chat-message user-message">
+                    <div class="message-label">You</div>
+                    <div>{message["user"]}</div>
+                </div>""",
+                unsafe_allow_html=True
+            )
+            # Bot message
+            st.markdown(
+                f"""<div class="chat-message bot-message">
+                    <div class="message-label">Bot</div>
+                    <div>{message["bot"]}</div>
+                </div>""",
+                unsafe_allow_html=True
+            )
+    st.markdown('</div>', unsafe_allow_html=True)
+    
 def main():
     """Main application function"""
     st.set_page_config(
