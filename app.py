@@ -25,6 +25,7 @@ def load_css():
             font-weight: 600;
         }
         .sidebar-logo {
+            max-width: 50%
             text-align: center;
             margin: 1rem 0;
             padding: 1rem;
