@@ -8,31 +8,44 @@ from src.config import (
     NAMESPACE_MAP
 )
 
-# Rest of your app.py code remains the same...
-
 def load_css():
     """Load custom CSS styles"""
     st.markdown("""
         <style>
-        .main-header {
-            font-size: 2.5rem;
-            color: #1E3A8A;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .sub-header {
-            font-size: 1.5rem;
-            color: #1E3A8A;
-            margin-bottom: 1rem;
-        }
-        .stRadio > div {
-            padding: 10px;
+        .contact-list {
             background-color: #f0f2f6;
+            padding: 1rem;
             border-radius: 5px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .contact-item {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+        }
+        .contact-item:hover {
+            background-color: #e3f2fd;
+        }
+        .contact-item.active {
+            background-color: #bbdefb;
+            border-left: 5px solid #1976d2;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            padding: 1rem;
+            border-radius: 5px;
+            height: 100%;
+            overflow-y: auto;
         }
         .chat-message {
-            padding: 1.5rem;
-            border-radius: 0.5rem;
+            padding: 1rem;
+            border-radius: 5px;
             margin-bottom: 1rem;
             position: relative;
         }
@@ -45,28 +58,11 @@ def load_css():
             border-left: 5px solid #4caf50;
         }
         .message-label {
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
             font-size: 0.8rem;
             color: #666;
         }
-        .error-message {
-            color: #d32f2f;
-            background-color: #ffebee;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .info-box {
-            background-color: #e3f2fd;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .loading-spinner {
-            text-align: center;
-            padding: 2rem;
+        .input-container {
+            margin-top: 1rem;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -74,61 +70,49 @@ def load_css():
 def initialize_session_state():
     """Initialize session state variables"""
     if "messages" not in st.session_state:
-        st.session_state.messages = []
-    if "current_topic" not in st.session_state:
-        st.session_state.current_topic = list(NAMESPACE_MAP.keys())[0]
+        st.session_state.messages = {namespace: [] for namespace in NAMESPACE_MAP.keys()}
+    if "current_namespace" not in st.session_state:
+        st.session_state.current_namespace = list(NAMESPACE_MAP.keys())[0]
 
-def display_sidebar():
-    """Display and configure sidebar elements"""
-    with st.sidebar:
-        try:
-            st.image(AMC_LOGO_URL, width=150)
-        except Exception:
-            st.error("Error loading AMC logo")
-
-        st.markdown("### Ahmedabad Municipal Corporation")
-        st.markdown("**અમદાવાદ મ્યુનિસિપલ કોર્પોરેશન**")
-        st.markdown("---")
-
-        st.markdown("### Available Topics")
-        for topic in NAMESPACE_MAP.keys():
-            st.markdown(f"- {topic}")
-
-        st.markdown("---")
-        st.markdown("### Instructions")
-        st.markdown("""
-        1. Select a topic from the main page
-        2. Type your question in English or Gujarati
-        3. Responses will always be in Gujarati
-        4. Be specific in your questions
-        """)
-
-        if st.button("Clear Chat History"):
-            st.session_state.messages = []
-            st.success("Chat history cleared!")
+def display_contact_list():
+    """Display the list of namespaces as contacts"""
+    st.markdown('<div class="contact-list">', unsafe_allow_html=True)
+    for namespace in NAMESPACE_MAP.keys():
+        active_class = "active" if namespace == st.session_state.current_namespace else ""
+        if st.button(namespace, key=f"contact_{namespace}"):
+            st.session_state.current_namespace = namespace
+        st.markdown(
+            f"""<div class="contact-item {active_class}">
+                <strong>{namespace}</strong>
+            </div>""",
+            unsafe_allow_html=True
+        )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def display_chat_messages():
-    """Display chat message history"""
-    for idx, message in enumerate(st.session_state.messages):
-        # User message
-        with st.container():
-            st.markdown(
-                f"""<div class="chat-message user-message">
-                    <div class="message-label">You</div>
-                    <div style="margin-top: 1rem">{message["user"]}</div>
-                </div>""",
-                unsafe_allow_html=True
-            )
+    """Display chat messages for the selected namespace"""
+    namespace = st.session_state.current_namespace
+    messages = st.session_state.messages[namespace]
 
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    for message in messages:
+        # User message
+        st.markdown(
+            f"""<div class="chat-message user-message">
+                <div class="message-label">You</div>
+                <div>{message["user"]}</div>
+            </div>""",
+            unsafe_allow_html=True
+        )
         # Bot message
-        with st.container():
-            st.markdown(
-                f"""<div class="chat-message bot-message">
-                    <div class="message-label">Bot</div>
-                    <div style="margin-top: 1rem">{message["bot"]}</div>
-                </div>""",
-                unsafe_allow_html=True
-            )
+        st.markdown(
+            f"""<div class="chat-message bot-message">
+                <div class="message-label">Bot</div>
+                <div>{message["bot"]}</div>
+            </div>""",
+            unsafe_allow_html=True
+        )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def main():
     """Main application function"""
@@ -153,82 +137,39 @@ def main():
         st.error(f"Failed to initialize services: {str(e)}")
         st.stop()
 
-    # Display sidebar
-    display_sidebar()
+    # Layout: Two columns
+    col1, col2 = st.columns([1, 3])
 
-    # Main content
-    st.markdown('<h1 class="main-header">AMC Information Chatbot</h1>', unsafe_allow_html=True)
+    with col1:
+        st.markdown("### Contacts")
+        display_contact_list()
 
-    # Topic selection
-    st.markdown('<h2 class="sub-header">Select Topic</h2>', unsafe_allow_html=True)
-    topic = st.radio(
-        "Choose a topic to query:",
-        tuple(NAMESPACE_MAP.keys()),
-        key="topic_selector"
-    )
-
-    # Update current topic in session state
-    st.session_state.current_topic = topic
-    namespace = NAMESPACE_MAP[topic]
-
-    # Display current topic info
-    st.markdown(
-        f"""<div class="info-box">
-            Currently selected topic: <strong>{topic}</strong>
-        </div>""",
-        unsafe_allow_html=True
-    )
-
-    # User input
-    user_input = st.text_input(
-        "Enter your question (English or Gujarati):",
-        key="user_input",
-        placeholder="Type your question here..."
-    )
-
-    # Process user input
-    if user_input:
-        with st.spinner("Processing your query..."):
-            try:
-                response, success = process_user_query(index, openai_client, user_input, namespace)
-
-                if success:
-                    st.session_state.messages.append({
-                        "user": user_input,
-                        "bot": response
-                    })
-                else:
-                    st.error("Failed to get a valid response. Please try again.")
-
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
-                st.markdown(
-                    """<div class="error-message">
-                        Please try again later or contact support if the problem persists.
-                    </div>""",
-                    unsafe_allow_html=True
-                )
-
-    # Display chat history
-    if st.session_state.messages:
-        st.markdown('<h2 class="sub-header">Chat History</h2>', unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"### Chat with {st.session_state.current_namespace}")
         display_chat_messages()
-    else:
-        st.markdown(
-            """<div class="info-box">
-                No messages yet. Start by asking a question above!
-            </div>""",
-            unsafe_allow_html=True
+
+        # User input
+        user_input = st.text_input(
+            "Enter your question:",
+            key="user_input",
+            placeholder="Type your question here..."
         )
 
-    # Footer
-    st.markdown("---")
-    st.markdown(
-        """<div style="text-align: center; color: #666;">
-            Powered by Ahmedabad Municipal Corporation
-        </div>""",
-        unsafe_allow_html=True
-    )
+        if user_input:
+            with st.spinner("Processing your query..."):
+                try:
+                    namespace = NAMESPACE_MAP[st.session_state.current_namespace]
+                    response, success = process_user_query(index, openai_client, user_input, namespace)
+
+                    if success:
+                        st.session_state.messages[st.session_state.current_namespace].append({
+                            "user": user_input,
+                            "bot": response
+                        })
+                    else:
+                        st.error("Failed to get a valid response. Please try again.")
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()
