@@ -8,7 +8,77 @@ from src.config import (
     NAMESPACE_MAP
 )
 
-# ... (keep all the CSS and other helper functions the same)
+def load_css():
+    """Load custom CSS styles"""
+    st.markdown("""
+        <style>
+        .main-header {
+            font-size: 2.5rem;
+            color: #1E3A8A;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .sub-header {
+            font-size: 1.5rem;
+            color: #1E3A8A;
+            margin-bottom: 1rem;
+        }
+        .stRadio > div {
+            padding: 10px;
+            background-color: #f0f2f6;
+            border-radius: 5px;
+        }
+        .chat-message {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            border-left: 5px solid #1976d2;
+        }
+        .bot-message {
+            background-color: #f5f5f5;
+            border-left: 5px solid #4caf50;
+        }
+        .message-label {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .info-box {
+            background-color: #e3f2fd;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+def initialize_session_state():
+    """Initialize session state variables"""
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    else:
+        # Validate existing messages
+        st.session_state.messages = [
+            msg for msg in st.session_state.messages
+            if isinstance(msg, dict) and 'user' in msg and 'bot' in msg
+        ]
 
 def display_sidebar():
     """Display and configure sidebar elements"""
@@ -39,6 +109,33 @@ def display_sidebar():
         if st.button("Clear Chat History"):
             st.session_state.messages = []
             st.success("Chat history cleared!")
+
+def display_chat_messages():
+    """Display chat message history"""
+    for message in st.session_state.messages:
+        try:
+            # User message
+            with st.container():
+                st.markdown(
+                    f"""<div class="chat-message user-message">
+                        <div class="message-label">You</div>
+                        <div style="margin-top: 1rem">{message.get('user', '')}</div>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+
+            # Bot message
+            with st.container():
+                st.markdown(
+                    f"""<div class="chat-message bot-message">
+                        <div class="message-label">Bot</div>
+                        <div style="margin-top: 1rem">{message.get('bot', '')}</div>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+        except Exception as e:
+            st.error(f"Error displaying message: {str(e)}")
+            continue
 
 def main():
     """Main application function"""
