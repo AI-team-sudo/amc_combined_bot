@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from src.utils import initialize_services, process_user_query
+from src.utils import initialize_services, process_user_query_all_namespaces  # We'll create this new function
 from src.config import (
     PAGE_TITLE,
     PAGE_ICON,
@@ -8,80 +8,7 @@ from src.config import (
     NAMESPACE_MAP
 )
 
-def load_css():
-    """Load custom CSS styles"""
-    st.markdown("""
-        <style>
-        .main-header {
-            font-size: 2.5rem;
-            color: #1E3A8A;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .sub-header {
-            font-size: 1.5rem;
-            color: #1E3A8A;
-            margin-bottom: 1rem;
-        }
-        .stRadio > div {
-            padding: 10px;
-            background-color: #f0f2f6;
-            border-radius: 5px;
-        }
-        .chat-message {
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        .user-message {
-            background-color: #e3f2fd;
-            border-left: 5px solid #1976d2;
-        }
-        .bot-message {
-            background-color: #f5f5f5;
-            border-left: 5px solid #4caf50;
-        }
-        .message-label {
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            font-size: 0.8rem;
-            color: #666;
-        }
-        .error-message {
-            color: #d32f2f;
-            background-color: #ffebee;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .info-box {
-            background-color: #e3f2fd;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .loading-spinner {
-            text-align: center;
-            padding: 2rem;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-def initialize_session_state():
-    """Initialize session state variables"""
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    else:
-        # Validate existing messages
-        st.session_state.messages = [
-            msg for msg in st.session_state.messages
-            if isinstance(msg, dict) and 'user' in msg and 'bot' in msg
-        ]
-
-    if "current_topic" not in st.session_state:
-        st.session_state.current_topic = list(NAMESPACE_MAP.keys())[0]
+# ... (keep all the CSS and other helper functions the same)
 
 def display_sidebar():
     """Display and configure sidebar elements"""
@@ -96,14 +23,15 @@ def display_sidebar():
         st.markdown("---")
 
         st.markdown("### Available Topics")
+        st.markdown("This chatbot covers:")
         for topic in NAMESPACE_MAP.keys():
             st.markdown(f"- {topic}")
 
         st.markdown("---")
         st.markdown("### Instructions")
         st.markdown("""
-        1. Select a topic from the main page
-        2. Type your question in English or Gujarati
+        1. Type your question in English or Gujarati
+        2. The bot will search across all topics
         3. Responses will always be in Gujarati
         4. Be specific in your questions
         """)
@@ -111,33 +39,6 @@ def display_sidebar():
         if st.button("Clear Chat History"):
             st.session_state.messages = []
             st.success("Chat history cleared!")
-
-def display_chat_messages():
-    """Display chat message history"""
-    for message in st.session_state.messages:
-        try:
-            # User message
-            with st.container():
-                st.markdown(
-                    f"""<div class="chat-message user-message">
-                        <div class="message-label">You</div>
-                        <div style="margin-top: 1rem">{message.get('user', '')}</div>
-                    </div>""",
-                    unsafe_allow_html=True
-                )
-
-            # Bot message
-            with st.container():
-                st.markdown(
-                    f"""<div class="chat-message bot-message">
-                        <div class="message-label">Bot</div>
-                        <div style="margin-top: 1rem">{message.get('bot', '')}</div>
-                    </div>""",
-                    unsafe_allow_html=True
-                )
-        except Exception as e:
-            st.error(f"Error displaying message: {str(e)}")
-            continue
 
 def main():
     """Main application function"""
@@ -168,22 +69,10 @@ def main():
     # Main content
     st.markdown('<h1 class="main-header">AMC Information Chatbot</h1>', unsafe_allow_html=True)
 
-    # Topic selection
-    st.markdown('<h2 class="sub-header">Select Topic</h2>', unsafe_allow_html=True)
-    topic = st.radio(
-        "Choose a topic to query:",
-        tuple(NAMESPACE_MAP.keys()),
-        key="topic_selector"
-    )
-
-    # Update current topic in session state
-    st.session_state.current_topic = topic
-    namespace = NAMESPACE_MAP[topic]
-
-    # Display current topic info
+    # Display info box
     st.markdown(
-        f"""<div class="info-box">
-            Currently selected topic: <strong>{topic}</strong>
+        """<div class="info-box">
+            Ask any question about GPMC Act, Circulars, or Tax Laws
         </div>""",
         unsafe_allow_html=True
     )
@@ -199,7 +88,7 @@ def main():
     if user_input:
         with st.spinner("Processing your query..."):
             try:
-                response, success = process_user_query(index, openai_client, user_input, namespace)
+                response, success = process_user_query_all_namespaces(index, openai_client, user_input)
 
                 if success:
                     st.session_state.messages.append({
