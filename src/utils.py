@@ -163,53 +163,29 @@ def validate_response(response: str) -> bool:
     if len(response) < 10:
         return False
     return True
-
-def process_user_query(index: Any, client: OpenAI, query: str, namespace: str) -> Tuple[str, bool]:
+def process_user_query(index: Any, client: OpenAI, query: str, namespace: str = None) -> Tuple[str, bool]:
     """
-    Process user query end-to-end.
+    Process user query across all namespaces or specific namespace.
 
     Args:
         index: Pinecone index object
         client: OpenAI client instance
         query: User query string
-        namespace: Namespace to query
-    """
-    try:
-        matches = query_pinecone(index, client, namespace, query)
-        if not matches:
-            return "માફ કરશો, કોई સંબંધિત માહિતી મળી નથી.", False
-
-        context, references = process_pinecone_results(matches)
-        response = generate_response(client, context, query, references)
-
-        if not validate_response(response):
-            return "માફ કરશો, યોગ્ય જવાબ જનરેટ કરવામાં અસમર્થ છું.", False
-
-        return response, True
-
-    except Exception as e:
-        log_error(e, "process_user_query")
-        return "માફ કરશો, પ્રક્રિયા દરમિયાન ભૂલ આવી છે.", False
-
-def process_user_query_all_namespaces(index: Any, client: OpenAI, query: str) -> Tuple[str, bool]:
-    """
-    Process user query across all namespaces.
-
-    Args:
-        index: Pinecone index object
-        client: OpenAI client instance
-        query: User query string
+        namespace: Optional namespace to query (if None, queries all namespaces)
     """
     try:
         all_matches = []
-        all_contexts = []
-        all_references = []
 
-        # Query each namespace
-        for namespace in NAMESPACE_MAP.values():
+        if namespace:
+            # Query specific namespace
             matches = query_pinecone(index, client, namespace, query)
-            if matches:
-                all_matches.extend(matches)
+            all_matches.extend(matches)
+        else:
+            # Query all namespaces
+            for ns in NAMESPACE_MAP.values():
+                matches = query_pinecone(index, client, ns, query)
+                if matches:
+                    all_matches.extend(matches)
 
         # Sort matches by score and take top 5
         all_matches.sort(key=lambda x: x.score, reverse=True)
@@ -230,5 +206,5 @@ def process_user_query_all_namespaces(index: Any, client: OpenAI, query: str) ->
         return response, True
 
     except Exception as e:
-        log_error(e, "process_user_query_all_namespaces")
+        log_error(e, "process_user_query")
         return "માફ કરશો, પ્રક્રિયા દરમિયાન ભૂલ આવી છે.", False
