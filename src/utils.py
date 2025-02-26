@@ -4,7 +4,7 @@ from openai import OpenAI
 from typing import Dict, List, Optional, Any, Tuple
 from pinecone import Pinecone, PineconeException
 
-from .config import GPT_MODEL, MAX_TOKENS, TEMPERATURE
+from .config import GPT_MODEL, MAX_TOKENS, TEMPERATURE, NAMESPACE_MAP
 from .prompts import SYSTEM_PROMPT, get_chat_prompt
 
 class APIError(Exception):
