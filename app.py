@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from src.utils import initialize_services, process_user_query_all_namespaces  # We'll create this new function
+from src.utils import initialize_services, process_user_query
 from src.config import (
     PAGE_TITLE,
     PAGE_ICON,
