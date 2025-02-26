@@ -88,7 +88,7 @@ def main():
     if user_input:
         with st.spinner("Processing your query..."):
             try:
-                response, success = process_user_query_all_namespaces(index, openai_client, user_input)
+                response, success = process_user_query(index, openai_client, user_input)
 
                 if success:
                     st.session_state.messages.append({
